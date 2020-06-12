@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	sniffer "github.com/steklyanov/trafficSniffer/Sniffer"
 )
 
 // serveCmd represents the serve command
@@ -27,7 +28,12 @@ var serveCmd = &cobra.Command{
 	Short: "Run tcp/ip sniffing",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("serve called")
+		serve()
 	},
+}
+
+func serve() {
+	sniffer.FindDevices()
 }
 
 func init() {

@@ -17,6 +17,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -26,8 +29,22 @@ var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Test script",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("test called")
+		TestUsage()
 	},
+}
+
+func TestUsage() {
+	// Open file instead of device
+	handle, err := pcap.OpenOffline("test.pcap")
+	if err != nil { log.Fatal(err) }
+	defer handle.Close()
+
+	// Loop through packets in file
+	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+	for packet := range packetSource.Packets() {
+		fmt.Println(packet)
+	}
+
 }
 
 func init() {

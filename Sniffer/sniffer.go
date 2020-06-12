@@ -97,6 +97,8 @@ func readData(packet gopacket.Packet) {
 	if tcpLayer := packet.Layer(layers.LayerTypeTCP); tcpLayer != nil {
 		t, _ := tcpLayer.(*layers.TCP)
 		var hello = tlsx.ClientHello{}
+		var ipDst  net.IP
+		var ipSrc net.IP
 
 		err := hello.Unmarshall(t.LayerPayload())
 
@@ -109,28 +111,17 @@ func readData(packet gopacket.Packet) {
 			log.Println("Raw Client Hello:", t.LayerPayload())
 			return
 		}
-		log.Printf("Client hello from port %s to %s", t.SrcPort, t.DstPort)
-
-		var ipDst  net.IP
-		var ipSrc net.IP
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
 		if ipLayer != nil {
-			fmt.Println("GET SOME DATA V4")
 			ip, _ := ipLayer.(*layers.IPv4)
 			ipDst = ip.DstIP
 			ipSrc = ip.SrcIP
 		} else {
 			ipLayer = packet.Layer(layers.LayerTypeIPv6)
-			fmt.Println("GET SOME DATA v6")
 			ip, _ := ipLayer.(*layers.IPv4)
 			ipDst = ip.DstIP
 			ipSrc = ip.SrcIP
 		}
-		fmt.Println(ipSrc, ipDst)
-		//fmt.Println(hello)
-	} else {
-
-		log.Println("Client Hello Reader could not decode TCP layer")
-		return
-	}
+		fmt.Println(ipSrc, t.SrcPort, ipDst, t.DstPort)
+	} else { return }
 }
